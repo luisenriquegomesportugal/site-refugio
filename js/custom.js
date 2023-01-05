@@ -69,7 +69,7 @@ $(function () {
 				map,
 				title: "Refúgio 54",
 				position: location,
-				icon: '/images/icone-marker.png'
+				icon: 'images/icone-marker.png'
 			});
 
 			marker.addListener("click", () => {
