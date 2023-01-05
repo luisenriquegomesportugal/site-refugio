@@ -24,64 +24,77 @@ $(function () {
 	});
 
 	let formString = '<form class="map-contact">'
-	+ '<h2>Refúgio 54</h2>'
-	+ '<input type="text" name="nome" placeholder="Nome Completo"/>'
-	+ '<input type="number" name="idade" placeholder="Idade"/>'
-	+ '<input type="tel" name="telefone" placeholder="Telefone"/>'
-	+ '<button type="submit">Desejo visitar essa célula</button>'
-	+ '</form>';
-	
-	
-	window.addEventListener('submit', function(event) {
+		+ '<h2>Refúgio 54</h2>'
+		+ '<input type="text" name="nome" placeholder="Nome Completo"/>'
+		+ '<input type="number" name="idade" placeholder="Idade"/>'
+		+ '<input type="tel" name="telefone" placeholder="Telefone"/>'
+		+ '<button type="submit">Desejo visitar essa célula</button>'
+		+ '</form>';
+
+
+	window.addEventListener('submit', function (event) {
 		event.preventDefault();
 
-		let [nome, idade, telefone, ] = event.target;
-		let params = new URLSearchParams({
-			phone: 559185286060,
-			apikey: 9167513,
-			text: `Gostaria de visitar a *Refúgio 54* (_enviado pelo site_).
+		if (event.target.classList.contains('map-contact')) {
+			let [nome, idade, telefone,] = event.target;
+			let params = new URLSearchParams({
+				phone: 559185286060,
+				apikey: 9167513,
+				text: `Gostaria de visitar a *Refúgio 54* (_enviado pelo site_).
 
 			*Nome:* ${nome.value}
 			*Idade:* ${idade.value}
 			*Telefone:* ${telefone.value}`
-		});
-		
-		fetch(`https://api.callmebot.com/whatsapp.php?${params.toString()}`)
-			.catch(function(err) {
-				console.log(err)
-			})
-			.finally(function() {
-				alert('Entraremos em contato o mais breve possível! Deus abençoe');
-				event.target.reset();
-			});
-	});
-
-	geocoder.geocode({ 'address': 'RUA ANTÔNIO EVERDOSA, 985, APTO 101' }, function ([address,], status) {
-		if (status === 'OK') {
-			let { location } = address.geometry;
-
-			const infowindow = new google.maps.InfoWindow({
-				content: formString,
-				ariaLabel: "Refúgio 54",
 			});
 
-			const marker = new google.maps.Marker({
-				map,
-				title: "Refúgio 54",
-				position: location,
-				icon: 'images/icone-marker.png'
-			});
-
-			marker.addListener("click", () => {
-				map.setCenter(location);
-				map.setZoom(15);
-				infowindow.open({
-					anchor: marker,
-					map,
+			fetch(`https://api.callmebot.com/whatsapp.php?${params.toString()}`)
+				.catch(function (err) {
+					console.log(err)
+				})
+				.finally(function () {
+					alert('Entraremos em contato o mais breve possível! Deus abençoe');
+					event.target.reset();
 				});
-			});
-		} else {
-			alert('Geocode was not successful for the following reason: ' + status);
 		}
 	});
+
+	fetch('https://docs.google.com/spreadsheets/d/193-JG5mPmBXXl90pvH44h5-A5jKD9j0ABG9hrU03FnY/gviz/tq?tqx=out:csv&tq&gid=0')
+		.then(res => res.text())
+		.then(csv => Papa.parse(csv, {header: true}))
+		.then(sheet => {
+			for(let celula of sheet.data) {
+				let enderecoCompleto = `${celula['ENDEREÇO']}-${celula['BAIRRO']}, ${celula['CEP']}, ${celula['CIDADE']}`;
+
+				geocoder.geocode({ 'address': enderecoCompleto }, function ([address,], status) {
+					if (status === 'OK') {
+						let { location } = address.geometry;
+			
+						const infowindow = new google.maps.InfoWindow({
+							content: formString,
+							ariaLabel: `Refúgio ${celula['CÉLULA']}`,
+						});
+			
+						const marker = new google.maps.Marker({
+							map,
+							title: `Refúgio ${celula['CÉLULA']}`,
+							position: location,
+							icon: 'images/icone-marker.png'
+						});
+			
+						marker.addListener("click", () => {
+							map.setCenter(location);
+							map.setZoom(15);
+							infowindow.open({
+								anchor: marker,
+								map,
+							});
+						});
+					} else {
+						alert('Geocode was not successful for the following reason: ' + status);
+					}
+				});
+			}
+		})
+
+	
 });
