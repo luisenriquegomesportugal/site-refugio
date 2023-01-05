@@ -1,10 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Rajdhani:300,400,500,600,700');
 @import url('https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i');
-@font-face {
-    font-family: "Righteous";
-    src: url("../fonts/BalooChettan-Regular.ttf");
-    src: url("../fonts/BalooChettan-Regular.ttf");
-}
 
 * {
     box-sizing: border-box !important;
@@ -23,7 +18,7 @@ body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-    background-image: url("images/bg.jpg");
+    background-image: url("../images/bg.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     display: flex;
@@ -148,7 +143,7 @@ img {
     min-height: 100vh;
     padding: 0;
     margin: 0;
-    background: url("images/banner-bg.png");
+    background: url("../images/banner-bg.png");
     background-position-x: center;
     background-position-y: bottom;
     background-size: 100%;
@@ -360,7 +355,7 @@ img {
 .footer_section {
     width: 100%;
     padding: 250px 0 25px 0;
-    background: url("images/footer-bg.png");
+    background: url("../images/footer-bg.png");
     background-position-x: center;
     background-position-y: top;
     background-size: 100%;
