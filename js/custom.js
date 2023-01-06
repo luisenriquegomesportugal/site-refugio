@@ -23,24 +23,26 @@ $(function () {
 		zoom: 13,
 	});
 
-	let formString = '<form class="map-contact">'
-		+ '<h2>Refúgio 54</h2>'
-		+ '<input type="text" name="nome" placeholder="Nome Completo"/>'
-		+ '<input type="number" name="idade" placeholder="Idade"/>'
-		+ '<input type="tel" name="telefone" placeholder="Telefone"/>'
-		+ '<button type="submit">Desejo visitar essa célula</button>'
-		+ '</form>';
-
+	let builderForm = function (celula) {
+		return `<form class="map-contact">`
+		+ `<h2>Refúgio ${celula}</h2>`
+		+ `<input type="hidden" name="celula" value="${celula}"/>`
+		+ `<input type="text" name="nome" placeholder="Nome Completo"/>`
+		+ `<input type="number" name="idade" placeholder="Idade"/>`
+		+ `<input type="tel" name="telefone" placeholder="Telefone"/>`
+		+ `<button type="submit">Desejo visitar essa célula</button>`
+		+ `</form>`;
+	}
 
 	window.addEventListener('submit', function (event) {
 		event.preventDefault();
 
 		if (event.target.classList.contains('map-contact')) {
-			let [nome, idade, telefone,] = event.target;
+			let [celula, nome, idade, telefone,] = event.target;
 			let params = new URLSearchParams({
 				phone: 559185286060,
 				apikey: 9167513,
-				text: `Gostaria de visitar a *Refúgio 54* (_enviado pelo site_).
+				text: `Gostaria de visitar a *Refúgio ${celula.value}* (_enviado pelo site_).
 
 			*Nome:* ${nome.value}
 			*Idade:* ${idade.value}
@@ -63,14 +65,14 @@ $(function () {
 		.then(csv => Papa.parse(csv, {header: true}))
 		.then(sheet => {
 			for(let celula of sheet.data) {
-				let enderecoCompleto = `${celula['ENDEREÇO']}-${celula['BAIRRO']}, ${celula['CEP']}, ${celula['CIDADE']}`;
+				let enderecoCompleto = `${celula['ENDEREÇO']} - ${celula['BAIRRO']}, ${celula['CEP']}, ${celula['CIDADE']}`;
 
 				geocoder.geocode({ 'address': enderecoCompleto }, function ([address,], status) {
 					if (status === 'OK') {
 						let { location } = address.geometry;
 			
 						const infowindow = new google.maps.InfoWindow({
-							content: formString,
+							content: builderForm(celula['CÉLULA']),
 							ariaLabel: `Refúgio ${celula['CÉLULA']}`,
 						});
 			
@@ -90,7 +92,7 @@ $(function () {
 							});
 						});
 					} else {
-						alert('Geocode was not successful for the following reason: ' + status);
+						console.log('Geocode was not successful for the following reason: ' + status, celula['CÉLULA']);
 					}
 				});
 			}
